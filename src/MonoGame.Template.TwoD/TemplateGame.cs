@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace MonoGame.SinglePlayer.Template;
+namespace MonoGame.Template.TwoD;
 
 public class TemplateGame : Game
 {

@@ -1,20 +1,20 @@
-# MonoGame Single Player Template
+# MonoGame Template TwoD
 
-A MonoGame single-player starter template with a clean, reusable project structure for 2D games.
+A MonoGame starter template with a clean, reusable project structure for 2D games.
 
 ## Solution Structure
 
 ```
 /src
- ├─ MonoGame.SinglePlayer.Template          → Main MonoGame game project
- └─ MonoGame.SinglePlayer.Template.Content  → Content Pipeline project and game assets
+ ├─ MonoGame.Template.TwoD          → Main MonoGame game project
+ └─ MonoGame.Template.TwoD.Content  → Content Pipeline project and game assets
 ```
 
 ## Project Structure
 
 ```
 src/
-  MonoGame.SinglePlayer.Template/
+  MonoGame.Template.TwoD/
     Program.cs
     TemplateGame.cs
     Core/
@@ -37,7 +37,7 @@ src/
       Entities/
         IEntity.cs
 
-  MonoGame.SinglePlayer.Template.Content/
+  MonoGame.Template.TwoD.Content/
     Content.mgcb
     Spritesheets/
     Tilesets/

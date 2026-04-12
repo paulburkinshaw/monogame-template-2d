@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonoGame.SinglePlayer.Template.World;
+namespace MonoGame.Template.TwoD.World;
 
 public class World
 {

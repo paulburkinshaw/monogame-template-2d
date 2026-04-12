@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonoGame.SinglePlayer.Template.World;
+namespace MonoGame.Template.TwoD.States;
 
-public class SceneService
+public interface IGameState
 {
 }

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonoGame.SinglePlayer.Template.Core;
+namespace MonoGame.Template.TwoD.Rendering;
 
-public class GameSettings
+public class GameRenderer
 {
 }

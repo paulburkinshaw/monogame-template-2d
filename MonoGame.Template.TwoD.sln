@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.SinglePlayer.Template", "src\MonoGame.SinglePlayer.Template\MonoGame.SinglePlayer.Template.csproj", "{B05BAB99-2D04-FF67-066F-FAD35D909308}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Template.TwoD", "src\MonoGame.Template.TwoD\MonoGame.Template.TwoD.csproj", "{B05BAB99-2D04-FF67-066F-FAD35D909308}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MonoGame.SinglePlayer.Template.Content", "MonoGame.SinglePlayer.Template.Content", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MonoGame.Template.TwoD.Content", "MonoGame.Template.TwoD.Content", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		src\MonoGame.SinglePlayer.Template.Content\Content.mgcb = src\MonoGame.SinglePlayer.Template.Content\Content.mgcb
+		src\MonoGame.Template.TwoD.Content\Content.mgcb = src\MonoGame.Template.TwoD.Content\Content.mgcb
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tilesets", "Tilesets", "{20F14BA6-E821-492D-8E31-C2A583B58838}"

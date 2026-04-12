@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonoGame.SinglePlayer.Template.States;
+namespace MonoGame.Template.TwoD.States;
 
-public interface IGameState
+public class GameStateMachine
 {
 }

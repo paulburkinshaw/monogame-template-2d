@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonoGame.SinglePlayer.Template.Rendering;
+namespace MonoGame.Template.TwoD.Rendering;
 
 public class DebugRenderer
 {
