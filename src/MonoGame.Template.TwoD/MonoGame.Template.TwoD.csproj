@@ -32,6 +32,22 @@
     <Folder Include="Gameplay\Entities\" />
     <Folder Include="Input\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="gameSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\MonoGame.Template.TwoD.Content\Spritesheets\player1-spritesheet.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>Content\Spritesheets\player1-spritesheet.json</Link>
+    </None>
+  </ItemGroup>
+  <!-- Content reference for MonoGame assets -->
+  <ItemGroup>
+    <MonoGameContentReference Include="..\MonoGame.Template.TwoD.Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\library-projects\MonoSprite\MonoSprite.csproj" />
+  </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="CollectPackageReferences">
     <Message Text="Restoring dotnet tools (this might take a while depending on your internet speed and should only happen upon building your project for the first time, or after upgrading MonoGame, or clearing your nuget cache)" Importance="High" />
     <Exec Command="dotnet tool restore" />

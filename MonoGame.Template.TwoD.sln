@@ -15,6 +15,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tilemaps", "Tilemaps", "{03593248-A4F0-4B62-9944-6189DB12A36E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Spritesheets", "Spritesheets", "{FCFC70A7-A9E1-43B6-8C5A-6994406986E8}"
+	ProjectSection(SolutionItems) = preProject
+		src\MonoGame.Template.TwoD.Content\Spritesheets\player1-spritesheet.json = src\MonoGame.Template.TwoD.Content\Spritesheets\player1-spritesheet.json
+		src\MonoGame.Template.TwoD.Content\Spritesheets\player1-spritesheet.png = src\MonoGame.Template.TwoD.Content\Spritesheets\player1-spritesheet.png
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoSprite", "src\library-projects\MonoSprite\MonoSprite.csproj", "{B52848F1-ED14-7AB0-9499-0E0D579ED6AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTiled", "src\library-projects\MonoTiled\MonoTiled.csproj", "{6474AD03-8957-CBE8-CDC9-907B5EF786D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledDotNet", "src\library-projects\TiledDotNet\TiledDotNet.csproj", "{AD5063A3-4236-7AE4-8949-BDA56FA6F585}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +36,18 @@ Global
 		{B05BAB99-2D04-FF67-066F-FAD35D909308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B05BAB99-2D04-FF67-066F-FAD35D909308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B05BAB99-2D04-FF67-066F-FAD35D909308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B52848F1-ED14-7AB0-9499-0E0D579ED6AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B52848F1-ED14-7AB0-9499-0E0D579ED6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B52848F1-ED14-7AB0-9499-0E0D579ED6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B52848F1-ED14-7AB0-9499-0E0D579ED6AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6474AD03-8957-CBE8-CDC9-907B5EF786D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6474AD03-8957-CBE8-CDC9-907B5EF786D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6474AD03-8957-CBE8-CDC9-907B5EF786D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6474AD03-8957-CBE8-CDC9-907B5EF786D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD5063A3-4236-7AE4-8949-BDA56FA6F585}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD5063A3-4236-7AE4-8949-BDA56FA6F585}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD5063A3-4236-7AE4-8949-BDA56FA6F585}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD5063A3-4236-7AE4-8949-BDA56FA6F585}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

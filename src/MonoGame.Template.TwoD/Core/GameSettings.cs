@@ -5,7 +5,10 @@ namespace MonoGame.Template.TwoD.Core;
 
 public interface IGameSettings
 {
-
+    TimeSpan TargetElapsedTime { get; }
+    Rectangle InternalSize { get; }
+    Rectangle WindowSize { get; }
+    AnimationSettings AnimationSettings { get; }
 }
 
 public class AnimationSettings
@@ -25,7 +28,7 @@ public class AnimationSettings
     /// Returns frame duration in milliseconds
     /// </summary>
     /// <returns></returns>
-    public float GetFrameDuration()
+    public float GetFrameDurationMs()
     {
         return 1 / _framesPerSecond * 1000f;
     }
@@ -33,10 +36,10 @@ public class AnimationSettings
 
 public class GameSettings : IGameSettings
 {
-    private Rectangle _internalSize;
-    private Rectangle _windowSize;
-    private TimeSpan _targetElapsedTime;
-    private AnimationSettings _animationSettings;
+    private readonly Rectangle _internalSize;
+    private readonly Rectangle _windowSize;
+    private readonly TimeSpan _targetElapsedTime;
+    private readonly AnimationSettings _animationSettings;
 
     public GameSettings(
         Rectangle internalSize,
@@ -57,8 +60,6 @@ public class GameSettings : IGameSettings
     }
 
     public TimeSpan TargetElapsedTime => _targetElapsedTime;
-    public float ElapsedGameTimeSeconds { get; set; }
-    public float ElapsedGameTimeMs { get; set; }
     public Rectangle InternalSize => _internalSize;
     public Rectangle WindowSize => _windowSize;
     public AnimationSettings AnimationSettings => _animationSettings;

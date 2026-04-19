@@ -1,0 +1,11 @@
+{
+    "internalSize": {
+        "width": 320,
+        "height": 180
+    },
+    "windowSize": {
+        "width": 1920,
+        "height": 1080
+    },
+    "targetFramesPerSecond": 30
+}
