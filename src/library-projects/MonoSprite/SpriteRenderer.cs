@@ -13,8 +13,7 @@ namespace MonoSprite
         private readonly SpriteBatch _spriteBatch;     
 
         public SpriteRenderer(           
-            SpriteBatch spriteBatch,        
-            Rectangle windowSize
+            SpriteBatch spriteBatch
             )
         {          
             _spriteBatch = spriteBatch;                           

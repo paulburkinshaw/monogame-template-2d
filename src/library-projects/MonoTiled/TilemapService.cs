@@ -9,7 +9,7 @@ namespace MonoTiled;
 
 public interface ITilemapService
 {
-    Tilemap Load(string tilemapFilepath, string tilesetFilepath, Rectangle internalSize, Rectangle windowSize);
+    Tilemap Load(string tilemapFilepath, string tilesetFilepath);
 }
 
 public class TilemapService : ITilemapService
@@ -17,24 +17,21 @@ public class TilemapService : ITilemapService
     private readonly ITiledTilemapService _tiledTilemapService;
     private readonly ITilesetTextureService _tilesetTextureService;
     private readonly ContentManager _content;
-    private readonly GraphicsDevice _graphicsDevice;
     private readonly SpriteBatch _spriteBatch;
 
     public TilemapService(
        ITiledTilemapService tiledTilemapService,
        ITilesetTextureService tilesetTextureService,
        ContentManager content,
-       GraphicsDevice graphicsDevice,
        SpriteBatch spriteBatch)
     {
         _tiledTilemapService = tiledTilemapService;
         _tilesetTextureService = tilesetTextureService;
         _content = content;
-        _graphicsDevice = graphicsDevice;
         _spriteBatch = spriteBatch;
     }
 
-    public Tilemap Load(string tilemapFilepath, string tilesetFilepath, Rectangle internalSize, Rectangle windowSize)
+    public Tilemap Load(string tilemapFilepath, string tilesetFilepath)
     {
         // Get Tiled tilemap from file
         var tiledTilemap = _tiledTilemapService.GetTiledTilemap(tilemapFilepath);
@@ -78,10 +75,7 @@ public class TilemapService : ITilemapService
         }
 
         var tilemapRenderer = new TilemapRenderer(
-            _graphicsDevice,
             _spriteBatch,
-            internalSize,
-            windowSize,
             _tilesetTextureService,
             tiledTilemap.TileCountX,
             tiledTilemap.TileCountY,
@@ -99,8 +93,6 @@ public class TilemapService : ITilemapService
             tiles,
             tilemapRenderer
         );
-
-        // tilemap.TilemapRenderer = tilemapRenderer;
 
         return tilemap;
     }

@@ -6,10 +6,13 @@ using MonoGame.Template.TwoD.Core;
 using MonoGame.Template.TwoD.Rendering;
 using MonoSprite;
 using MonoSprite.Converters;
+using MonoTiled;
 using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Text.Json;
+using TiledDotNet;
+using TiledDotNet.Converters;
 
 namespace MonoGame.Template.TwoD;
 
@@ -25,6 +28,9 @@ public class TemplateGame : Game
     private ISpriteService _spriteService;
     private Sprite _sprite1;
 
+    private ITilemapService _tilemapService;
+    private Tilemap _tilemap1;
+   
     private IGameRenderer _gameRenderer;
 
     private IGameSettings _gameSettings;
@@ -48,14 +54,28 @@ public class TemplateGame : Game
 
         serviceCollection.AddSingleton<IFileSystem, FileSystem>();
 
+        // Sprite services
         serviceCollection.AddSingleton<IAsepriteSpritesheetJsonConverterService, AsepriteSpritesheetJsonConverterService>();
         serviceCollection.AddSingleton<IAsepriteSpritesheetService, AsepriteSpritesheetService>();
         serviceCollection.AddSingleton<ISpriteService, SpriteService>(sp =>
            new SpriteService(
-            asepriteSpritesheetService: sp.GetRequiredService<IAsepriteSpritesheetService>(),
-            content: Content,
-            graphicsDevice: sp.GetRequiredService<GraphicsDevice>(),
-            spriteBatch: sp.GetRequiredService<SpriteBatch>()
+                asepriteSpritesheetService: sp.GetRequiredService<IAsepriteSpritesheetService>(),
+                content: Content,
+                graphicsDevice: sp.GetRequiredService<GraphicsDevice>(),
+                spriteBatch: sp.GetRequiredService<SpriteBatch>()
+        ));
+
+        // Tilemap services
+        serviceCollection.AddSingleton<ITiledTilemapJsonConverterService, TiledTilemapJsonConverterService>();
+        serviceCollection.AddSingleton<ITiledTilemapService, TiledTilemapService>();
+        // Provides tile colour data for pixel-perfect collision detection
+        serviceCollection.AddSingleton<ITilesetTextureService, TilesetTextureService>();
+        serviceCollection.AddSingleton<ITilemapService, TilemapService>(sp =>
+            new TilemapService(
+                tiledTilemapService: _serviceProvider.GetRequiredService<ITiledTilemapService>(),
+                tilesetTextureService: _serviceProvider.GetRequiredService<ITilesetTextureService>(),
+                content: Content,
+                spriteBatch: _serviceProvider.GetRequiredService<SpriteBatch>()
         ));
 
         serviceCollection.AddSingleton<IGameRenderer>(sp =>
@@ -76,6 +96,8 @@ public class TemplateGame : Game
         _spriteBatch = _serviceProvider.GetRequiredService<SpriteBatch>();
         _spriteService = _serviceProvider.GetRequiredService<ISpriteService>();
 
+        _tilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
+
         _graphicsDeviceManager.IsFullScreen = false;
         _graphicsDeviceManager.PreferredBackBufferWidth = _gameSettings.WindowSize.Width;
         _graphicsDeviceManager.PreferredBackBufferHeight = _gameSettings.WindowSize.Height;
@@ -83,7 +105,7 @@ public class TemplateGame : Game
         _graphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
 
         IsFixedTimeStep = true;
-        TargetElapsedTime = _gameSettings.TargetElapsedTime;
+        TargetElapsedTime = _gameSettings.AnimationSettings.TargetElapsedTime;
 
         base.Initialize();
     }
@@ -95,8 +117,14 @@ public class TemplateGame : Game
             spritesheetFilepath: @"Spritesheets",
             spritesheetName: "player1-spritesheet",
             initialAnimationName: "Landed",
-            _spriteBatch,
-            _gameSettings.WindowSize);
+            _spriteBatch);
+
+        // Load tilemaps
+        var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
+        _tilemap1 = _tilemapService.Load(
+           tilemapFilepath: tilemapFilePath, 
+           tilesetFilepath: "Tilesets"
+        );
 
     }
 
@@ -112,7 +140,7 @@ public class TemplateGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        _gameRenderer.Render(gameTime);
+        _gameRenderer.Render(gameTime, _sprite1, _tilemap1);
 
         base.Draw(gameTime);
     }
@@ -135,7 +163,7 @@ public class TemplateGame : Game
         }
 
         var json = File.ReadAllText(settingsPath);
-        var settingsConfig = JsonSerializer.Deserialize<GameSettingsConfig>(json, new JsonSerializerOptions
+        var gameSettingsConfig = JsonSerializer.Deserialize<GameSettingsConfig>(json, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
@@ -143,13 +171,14 @@ public class TemplateGame : Game
         return new GameSettings(
             internalSize: new Rectangle(
                 0, 0,
-                settingsConfig.InternalSize.Width,
-                settingsConfig.InternalSize.Height),
+                gameSettingsConfig.InternalSize.Width,
+                gameSettingsConfig.InternalSize.Height),
             windowSize: new Rectangle(
                 0, 0,
-                settingsConfig.WindowSize.Width,
-                settingsConfig.WindowSize.Height),
-            animationSettings: new AnimationSettings(),
-            targetFramesPerSecond: settingsConfig.TargetFramesPerSecond);
+                gameSettingsConfig.WindowSize.Width,
+                gameSettingsConfig.WindowSize.Height),
+            animationSettings: new AnimationSettings(gameSettingsConfig.AnimationSettings.TargetFramesPerSecond),
+            tilemapSettings: new TilemapSettings((TilemapType)gameSettingsConfig.TilemapSettings.TilemapType)
+        );
     }
 }

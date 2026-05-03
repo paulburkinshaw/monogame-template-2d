@@ -1,11 +1,16 @@
 {
-    "internalSize": {
-        "width": 320,
-        "height": 180
-    },
-    "windowSize": {
-        "width": 1920,
-        "height": 1080
-    },
+  "internalSize": {
+    "width": 640,
+    "height": 360
+  },
+  "windowSize": {
+    "width": 1920,
+    "height": 1080
+  },
+  "animationSettings": {
     "targetFramesPerSecond": 30
+  },
+  "tilemapSettings": {
+    "tilemapType": 1
+  }
 }

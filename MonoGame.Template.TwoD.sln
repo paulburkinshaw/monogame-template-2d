@@ -11,8 +11,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MonoGame.Template.TwoD.Cont
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tilesets", "Tilesets", "{20F14BA6-E821-492D-8E31-C2A583B58838}"
+	ProjectSection(SolutionItems) = preProject
+		src\MonoGame.Template.TwoD.Content\Tilesets\tileset.tsj = src\MonoGame.Template.TwoD.Content\Tilesets\tileset.tsj
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tilemaps", "Tilemaps", "{03593248-A4F0-4B62-9944-6189DB12A36E}"
+	ProjectSection(SolutionItems) = preProject
+		src\MonoGame.Template.TwoD.Content\Tilemaps\tilemap1.tmj = src\MonoGame.Template.TwoD.Content\Tilemaps\tilemap1.tmj
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Spritesheets", "Spritesheets", "{FCFC70A7-A9E1-43B6-8C5A-6994406986E8}"
 	ProjectSection(SolutionItems) = preProject

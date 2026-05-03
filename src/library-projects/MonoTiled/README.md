@@ -31,3 +31,9 @@ map.Load("Content/Maps/MyMap.tmx");
 // In your game's Draw method, render the map
 map.Draw(spriteBatch);
 ```
+
+## Tilemap Rendering
+
+The `TilemapRenderer` class is currently designed for dynamic tilemaps where the tiles can change each frame, so it renders each tile every frame.
+For static tilemaps (i.e. tilemaps that do not change) it would be more efficient to render the tilemap to a texture once and then draw that texture each frame. This is a potential future enhancement to improve performance for static tilemaps.
+Support for static tilemaps is currently not implemented, but it is planned for a future update.

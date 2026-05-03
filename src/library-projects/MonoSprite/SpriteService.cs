@@ -17,16 +17,13 @@ namespace MonoSprite
         /// <param name="spritesheetFilepath"></param>
         /// <param name="spritesheetName"></param>
         /// <param name="initialAnimationName"></param>
-        /// <param name="gameSettings"></param>
         /// <param name="spriteBatch"></param>
-        /// <param name="windowSize"></param>
         /// <returns></returns>
         Sprite CreateSpriteInstance(
             string spritesheetFilepath,
             string spritesheetName,
             string initialAnimationName,
-            SpriteBatch spriteBatch,
-            Rectangle windowSize);
+            SpriteBatch spriteBatch);
 
         /// <summary>
         /// Create a new SpriteInstance from an existing Spritesheet instance
@@ -36,15 +33,12 @@ namespace MonoSprite
         /// </summary>
         /// <param name="spritesheet"></param>
         /// <param name="initialAnimationName"></param>
-        /// <param name="gameSettings"></param>
         /// <param name="spriteBatch"></param>
-        /// <param name="windowSize"></param>
         /// <returns></returns>
         Sprite CreateSpriteInstance(
            Spritesheet spritesheet,
            string initialAnimationName,      
-           SpriteBatch spriteBatch,
-           Rectangle windowSize);
+           SpriteBatch spriteBatch);
     }
     public class SpriteService : ISpriteService
     {
@@ -108,14 +102,13 @@ namespace MonoSprite
             string spritesheetFilepath,
             string spritesheetName,
             string initialAnimationName,
-            SpriteBatch spriteBatch,
-            Rectangle windowSize)
+            SpriteBatch spriteBatch)
         {
             // Load or retrieve the shared Spritesheet
             var spritesheet = LoadSpritesheet(spritesheetFilepath, spritesheetName);
 
             // Create the SpriteRenderer
-            var spriteRenderer = new SpriteRenderer(spriteBatch, windowSize);
+            var spriteRenderer = new SpriteRenderer(spriteBatch);
 
             // Create and return the SpriteInstance, passing the renderer if needed
             var spriteInstance = new Sprite(
@@ -136,11 +129,10 @@ namespace MonoSprite
         public Sprite CreateSpriteInstance(
            Spritesheet spritesheet,          
            string initialAnimationName,
-           SpriteBatch spriteBatch,
-           Rectangle windowSize)
+           SpriteBatch spriteBatch)
         {
             // Create the SpriteRenderer
-            var spriteRenderer = new SpriteRenderer(spriteBatch, windowSize);
+            var spriteRenderer = new SpriteRenderer(spriteBatch);
 
             // Create and return the SpriteInstance, passing the renderer if needed
             var spriteInstance = new Sprite(

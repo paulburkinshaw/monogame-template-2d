@@ -59,13 +59,12 @@ public class Tile
                Matrix.CreateScale(1f) *
                Matrix.CreateTranslation(PositionX, PositionY, 0);
     }
-
 }
 
 public interface ITilemap
 {
     List<Tile> GetNearestTiles(Rectangle boundingBox);
-    void DrawTilemap();
+    void Draw();
 }
 
 public class Tilemap : ITilemap
@@ -148,7 +147,7 @@ public class Tilemap : ITilemap
         return nearestTiles;
     }
 
-    public void DrawTilemap()
+    public void Draw()
     {
         _tilemapRenderer.Draw();
     }

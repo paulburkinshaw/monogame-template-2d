@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -40,6 +40,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Link>Content\Spritesheets\player1-spritesheet.json</Link>
     </None>
+    <None Include="..\MonoGame.Template.TwoD.Content\Tilemaps\tilemap1.tmj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>Content\Tilemaps\tilemap1.tmj</Link>
+    </None>
+    <None Include="..\MonoGame.Template.TwoD.Content\Tilesets\tileset.tsj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>Content\Tilesets\tileset.tsj</Link>
+    </None>
   </ItemGroup>
   <!-- Content reference for MonoGame assets -->
   <ItemGroup>
@@ -47,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\library-projects\MonoSprite\MonoSprite.csproj" />
+    <ProjectReference Include="..\library-projects\MonoTiled\MonoTiled.csproj" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="CollectPackageReferences">
     <Message Text="Restoring dotnet tools (this might take a while depending on your internet speed and should only happen upon building your project for the first time, or after upgrading MonoGame, or clearing your nuget cache)" Importance="High" />
