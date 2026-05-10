@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Template.TwoD.Core;
+using MonoGame.Template.TwoD.Gameplay.GameEntities;
 using MonoSprite;
 using MonoTiled;
 
@@ -8,7 +9,7 @@ namespace MonoGame.Template.TwoD.Rendering;
 
 public interface IGameRenderer
 {
-    public void Render(GameTime gameTime, Sprite sprite, Tilemap tilemap);
+    public void Render(Tilemap tilemap);
 }
 
 public class GameRenderer : IGameRenderer
@@ -17,19 +18,24 @@ public class GameRenderer : IGameRenderer
     private readonly SpriteBatch _spriteBatch;
     private RenderTarget2D _offScreenRenderTarget;
 
+    private readonly IEntityService _entityService;
+
     private readonly IGameSettings _gameSettings;
 
     public GameRenderer(
         GraphicsDevice graphicsDevice,
         SpriteBatch spriteBatch,
-        ISpriteService spriteService,
+        IEntityService entityService,
         IGameSettings gameSettings
     )
     {
         _gameSettings = gameSettings;
+
         _graphicsDevice = graphicsDevice;
         _spriteBatch = spriteBatch;
-     
+
+        _entityService = entityService;
+
         _offScreenRenderTarget = new RenderTarget2D(
             graphicsDevice,
             _gameSettings.InternalSize.Width,
@@ -37,14 +43,14 @@ public class GameRenderer : IGameRenderer
         );
     }
 
-    public void Render(GameTime gameTime, Sprite sprite, Tilemap tilemap)
+    public void Render(Tilemap tilemap)
     {
         _graphicsDevice.SetRenderTarget(_offScreenRenderTarget);
         _graphicsDevice.Clear(Color.Transparent);
 
         _spriteBatch.Begin();
 
-        DrawToOffScreenRenderTarget(sprite, tilemap);
+        DrawToOffScreenRenderTarget(tilemap);
 
         _spriteBatch.End();
 
@@ -57,11 +63,19 @@ public class GameRenderer : IGameRenderer
     /// Draw everything to an off-screen render target.
     /// This allows us to apply scaling and other effects before drawing to the back buffer (the screen).
     /// </summary>
-    private void DrawToOffScreenRenderTarget(Sprite sprite, Tilemap tilemap)
+    private void DrawToOffScreenRenderTarget(Tilemap tilemap)
     {
         tilemap.Draw();
 
-        sprite.Draw(position: new Vector2(100, 100), origin: new Vector2(8, 8));
+        // Get renderable entities
+        var renderableEntities = _entityService.GetRenderables();
+
+        foreach (var entity in renderableEntities)
+        {
+            entity.Draw();
+        }
+
+        // sprite.Draw(position: new Vector2(100, 100), origin: new Vector2(8, 8));
     }
 
     /// <summary>

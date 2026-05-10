@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Template.TwoD.Core;
+using MonoGame.Template.TwoD.Gameplay.GameEntities;
 using MonoGame.Template.TwoD.Rendering;
 using MonoSprite;
 using MonoSprite.Converters;
@@ -26,11 +27,12 @@ public class TemplateGame : Game
     // One SpriteBatch instance will be used for the whole game
     private SpriteBatch _spriteBatch;
     private ISpriteService _spriteService;
-    private Sprite _sprite1;
+
+    private IEntityService _entityService;
 
     private ITilemapService _tilemapService;
     private Tilemap _tilemap1;
-   
+
     private IGameRenderer _gameRenderer;
 
     private IGameSettings _gameSettings;
@@ -65,6 +67,8 @@ public class TemplateGame : Game
                 spriteBatch: sp.GetRequiredService<SpriteBatch>()
         ));
 
+        serviceCollection.AddSingleton<IEntityService, EntityService>();
+
         // Tilemap services
         serviceCollection.AddSingleton<ITiledTilemapJsonConverterService, TiledTilemapJsonConverterService>();
         serviceCollection.AddSingleton<ITiledTilemapService, TiledTilemapService>();
@@ -82,7 +86,7 @@ public class TemplateGame : Game
             new GameRenderer(
                graphicsDevice: sp.GetRequiredService<GraphicsDevice>(),
                spriteBatch: sp.GetRequiredService<SpriteBatch>(),
-               spriteService: sp.GetRequiredService<ISpriteService>(),
+               entityService: sp.GetRequiredService<IEntityService>(),
                gameSettings: sp.GetRequiredService<IGameSettings>()
             )
         );
@@ -95,6 +99,8 @@ public class TemplateGame : Game
 
         _spriteBatch = _serviceProvider.GetRequiredService<SpriteBatch>();
         _spriteService = _serviceProvider.GetRequiredService<ISpriteService>();
+
+        _entityService = _serviceProvider.GetRequiredService<IEntityService>();
 
         _tilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
 
@@ -113,19 +119,28 @@ public class TemplateGame : Game
     protected override void LoadContent()
     {
         // Load sprites
-        _sprite1 = _spriteService.CreateSpriteInstance(
+        var playerSprite = _spriteService.CreateSpriteInstance(
             spritesheetFilepath: @"Spritesheets",
             spritesheetName: "player1-spritesheet",
             initialAnimationName: "Landed",
             _spriteBatch);
 
+        var player1 = new Player(
+         sprite: playerSprite,
+         transform: new Transform(
+             position: new Vector2(40,230),
+             origin: new Vector2(8, 8)
+         )
+        );
+
+        _entityService.Register(player1);
+
         // Load tilemaps
         var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
         _tilemap1 = _tilemapService.Load(
-           tilemapFilepath: tilemapFilePath, 
+           tilemapFilepath: tilemapFilePath,
            tilesetFilepath: "Tilesets"
         );
-
     }
 
     protected override void Update(GameTime gameTime)
@@ -134,13 +149,20 @@ public class TemplateGame : Game
             Exit();
 
         // TODO: Add your update logic here
+        var updateableEntities = _entityService.GetUpdatables();
+
+        // Update all updateable entities
+        foreach (var entity in updateableEntities)
+        {
+            entity.Update(gameTime);
+        }
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        _gameRenderer.Render(gameTime, _sprite1, _tilemap1);
+        _gameRenderer.Render(_tilemap1);
 
         base.Draw(gameTime);
     }
