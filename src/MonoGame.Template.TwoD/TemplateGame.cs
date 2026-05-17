@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Template.TwoD.Core;
 using MonoGame.Template.TwoD.Gameplay.GameEntities;
 using MonoGame.Template.TwoD.Rendering;
+using MonoGame.Template.TwoD.World;
 using MonoSprite;
 using MonoSprite.Converters;
 using MonoTiled;
@@ -31,11 +32,12 @@ public class TemplateGame : Game
     private IEntityService _entityService;
 
     private ITilemapService _tilemapService;
-    private Tilemap _tilemap1;
 
     private IGameRenderer _gameRenderer;
 
     private IGameSettings _gameSettings;
+
+    private GameWorld _gameWorld;
 
     public TemplateGame()
     {
@@ -76,19 +78,27 @@ public class TemplateGame : Game
         serviceCollection.AddSingleton<ITilesetTextureService, TilesetTextureService>();
         serviceCollection.AddSingleton<ITilemapService, TilemapService>(sp =>
             new TilemapService(
-                tiledTilemapService: _serviceProvider.GetRequiredService<ITiledTilemapService>(),
-                tilesetTextureService: _serviceProvider.GetRequiredService<ITilesetTextureService>(),
+                tiledTilemapService: sp.GetRequiredService<ITiledTilemapService>(),
+                tilesetTextureService: sp.GetRequiredService<ITilesetTextureService>(),
                 content: Content,
-                spriteBatch: _serviceProvider.GetRequiredService<SpriteBatch>()
+                spriteBatch: sp.GetRequiredService<SpriteBatch>()
         ));
 
         serviceCollection.AddSingleton<IGameRenderer>(sp =>
             new GameRenderer(
                graphicsDevice: sp.GetRequiredService<GraphicsDevice>(),
                spriteBatch: sp.GetRequiredService<SpriteBatch>(),
-               entityService: sp.GetRequiredService<IEntityService>(),
-               gameSettings: sp.GetRequiredService<IGameSettings>()
+               gameSettings: sp.GetRequiredService<IGameSettings>(),
+               gameWorld: sp.GetRequiredService<IGameWorld>()
             )
+        );
+
+        // Register the concrete GameWorld for TemplateGame ownership/mutation
+        // then expose the same singleton as IGameWorld for read-only consumers such as the renderer
+        serviceCollection.AddSingleton<GameWorld>();
+
+        serviceCollection.AddSingleton<IGameWorld, GameWorld>(sp =>
+           sp.GetRequiredService<GameWorld>()
         );
 
         // Build the service provider
@@ -104,6 +114,8 @@ public class TemplateGame : Game
 
         _tilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
 
+        _gameWorld = _serviceProvider.GetRequiredService<GameWorld>();
+
         _graphicsDeviceManager.IsFullScreen = false;
         _graphicsDeviceManager.PreferredBackBufferWidth = _gameSettings.WindowSize.Width;
         _graphicsDeviceManager.PreferredBackBufferHeight = _gameSettings.WindowSize.Height;
@@ -118,7 +130,7 @@ public class TemplateGame : Game
 
     protected override void LoadContent()
     {
-        // Load sprites
+
         var playerSprite = _spriteService.CreateSpriteInstance(
             spritesheetFilepath: @"Spritesheets",
             spritesheetName: "player1-spritesheet",
@@ -128,19 +140,20 @@ public class TemplateGame : Game
         var player1 = new Player(
          sprite: playerSprite,
          transform: new Transform(
-             position: new Vector2(40,230),
+             position: new Vector2(40, 230),
              origin: new Vector2(8, 8)
          )
         );
 
         _entityService.Register(player1);
 
-        // Load tilemaps
         var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
-        _tilemap1 = _tilemapService.Load(
+        var tilemap = _tilemapService.Load(
            tilemapFilepath: tilemapFilePath,
            tilesetFilepath: "Tilesets"
         );
+
+        _gameWorld.AddTilemap(tilemap);
     }
 
     protected override void Update(GameTime gameTime)
@@ -148,8 +161,8 @@ public class TemplateGame : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-        var updateableEntities = _entityService.GetUpdatables();
+        var entities = _gameWorld.Entities;
+        var updateableEntities = entities.GetUpdatables();
 
         // Update all updateable entities
         foreach (var entity in updateableEntities)
@@ -162,7 +175,7 @@ public class TemplateGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        _gameRenderer.Render(_tilemap1);
+        _gameRenderer.Render();
 
         base.Draw(gameTime);
     }
