@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Template.TwoD.Core;
 using MonoGame.Template.TwoD.Gameplay.GameEntities;
+using MonoGame.Template.TwoD.Input;
 using MonoGame.Template.TwoD.Rendering;
 using MonoGame.Template.TwoD.World;
 using MonoSprite;
@@ -28,8 +29,6 @@ public class TemplateGame : Game
     // One SpriteBatch instance will be used for the whole game
     private SpriteBatch _spriteBatch;
     private ISpriteService _spriteService;
-
-    private IEntityService _entityService;
 
     private ITilemapService _tilemapService;
 
@@ -110,8 +109,6 @@ public class TemplateGame : Game
         _spriteBatch = _serviceProvider.GetRequiredService<SpriteBatch>();
         _spriteService = _serviceProvider.GetRequiredService<ISpriteService>();
 
-        _entityService = _serviceProvider.GetRequiredService<IEntityService>();
-
         _tilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
 
         _gameWorld = _serviceProvider.GetRequiredService<GameWorld>();
@@ -130,22 +127,30 @@ public class TemplateGame : Game
 
     protected override void LoadContent()
     {
-
         var playerSprite = _spriteService.CreateSpriteInstance(
             spritesheetFilepath: @"Spritesheets",
             spritesheetName: "player1-spritesheet",
             initialAnimationName: "Landed",
             _spriteBatch);
 
+        // This could come from a main menu selection
+        var inputSource = new KeyboardInputSource(
+            leftKey: Keys.A,
+            rightKey: Keys.D,
+            upKey: Keys.W,
+            downKey: Keys.X
+        );
+
         var player1 = new Player(
          sprite: playerSprite,
          transform: new Transform(
              position: new Vector2(40, 230),
              origin: new Vector2(8, 8)
-         )
+         ),
+         inputSource: inputSource
         );
-
-        _entityService.Register(player1);
+       
+        _gameWorld.EntityService.Register(player1);
 
         var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
         var tilemap = _tilemapService.Load(
@@ -161,10 +166,17 @@ public class TemplateGame : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        var entities = _gameWorld.Entities;
-        var updateableEntities = entities.GetUpdatables();
+        var entityService = _gameWorld.EntityService;
+         
+        // process input for entities that have input source (ie player entities)
+        var entitiesWithInputSource = entityService.GetEntitiesWithInputSource();
+        foreach (var entity in entitiesWithInputSource)
+        {
+            entity.InputSource.ProcessInput();
+        }
 
         // Update all updateable entities
+        var updateableEntities = entityService.GetUpdatables();       
         foreach (var entity in updateableEntities)
         {
             entity.Update(gameTime);

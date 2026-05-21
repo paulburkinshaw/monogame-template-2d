@@ -11,13 +11,13 @@ public class GameWorld : IGameWorld
     private IList<Tilemap> _tilemaps = new List<Tilemap>();
     private Tilemap? _activeTilemap;
 
-    public GameWorld(IEntityService entities)
+    public GameWorld(IEntityService entityService)
     {
-        Entities = entities ?? throw new ArgumentNullException(nameof(entities));
+        EntityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         Tilemaps = new ReadOnlyCollection<Tilemap>(_tilemaps);
     }
 
-    public IEntityService Entities { get; }
+    public IEntityService EntityService { get; }
 
     public IReadOnlyCollection<Tilemap> Tilemaps { get; }
 

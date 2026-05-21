@@ -63,13 +63,13 @@ public class GameRenderer : IGameRenderer
     /// </summary>
     private void DrawToOffScreenRenderTarget()
     {
-        var entities = _gameWorld.Entities;
+        var entityService = _gameWorld.EntityService;
         var tilemap = _gameWorld.ActiveTilemap;
 
         tilemap.Draw();
 
         // Get renderable entities
-        var renderableEntities = entities.GetRenderables();
+        var renderableEntities = entityService.GetRenderables();
 
         foreach (var entity in renderableEntities)
         {

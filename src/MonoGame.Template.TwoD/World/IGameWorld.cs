@@ -6,7 +6,7 @@ namespace MonoGame.Template.TwoD.World;
 
 public interface IGameWorld
 {
-    IEntityService Entities { get; }
+    IEntityService EntityService { get; }
     IReadOnlyCollection<Tilemap> Tilemaps { get; }
     Tilemap ActiveTilemap { get; }
 }

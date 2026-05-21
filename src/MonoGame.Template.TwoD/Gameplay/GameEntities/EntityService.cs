@@ -14,6 +14,7 @@ public interface IEntityService
 
     IReadOnlyCollection<IUpdatable> GetUpdatables();
     IReadOnlyCollection<IRenderable> GetRenderables();
+    IReadOnlyCollection<IHasInputSource> GetEntitiesWithInputSource();
 }
 
 public class EntityService : IEntityService
@@ -70,6 +71,14 @@ public class EntityService : IEntityService
     {
         return _entities.Values
             .OfType<IRenderable>()
+            .ToList()
+            .AsReadOnly();
+    }
+
+    public IReadOnlyCollection<IHasInputSource> GetEntitiesWithInputSource()
+    {
+        return _entities.Values
+            .OfType<IHasInputSource>()
             .ToList()
             .AsReadOnly();
     }
