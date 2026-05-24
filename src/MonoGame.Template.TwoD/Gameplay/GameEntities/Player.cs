@@ -9,7 +9,7 @@ public sealed class Player : Entity, IUpdatable, IRenderable, IHasTransform, IHa
 {
     private readonly Sprite _sprite;
 
-    public Transform Transform { get; }
+    public Transform Transform { get; private set; }
 
     public IInputSource InputSource { get; }
 
@@ -30,8 +30,19 @@ public sealed class Player : Entity, IUpdatable, IRenderable, IHasTransform, IHa
         // Handle input
         if (InputSource.MoveLeft)
         {
-            // Move player left
+            // Move player left        
+            var newPosition = Transform.Position + new Vector2(-100 * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+            Transform.SetPosition(newPosition);
         }
+       
+        if (InputSource.MoveRight)
+        {
+            // Move player right        
+            var newPosition = Transform.Position + new Vector2(100 * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+            Transform.SetPosition(newPosition);
+        }
+
+        // Handle other input and game logic as needed
 
     }
 

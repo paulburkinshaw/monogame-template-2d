@@ -32,4 +32,9 @@ public sealed class Transform
         Position = position;
         Origin = origin;
     }
+
+    public void SetPosition(Vector2 position)
+    {
+        Position = position;
+    }
 }
