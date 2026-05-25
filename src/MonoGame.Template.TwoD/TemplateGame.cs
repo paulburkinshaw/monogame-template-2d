@@ -6,11 +6,14 @@ using MonoGame.Template.TwoD.Core;
 using MonoGame.Template.TwoD.Gameplay.GameEntities;
 using MonoGame.Template.TwoD.Input;
 using MonoGame.Template.TwoD.Rendering;
+using MonoGame.Template.TwoD.States;
+using MonoGame.Template.TwoD.UI;
 using MonoGame.Template.TwoD.World;
 using MonoSprite;
 using MonoSprite.Converters;
 using MonoTiled;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Text.Json;
@@ -32,11 +35,13 @@ public class TemplateGame : Game
 
     private ITilemapService _tilemapService;
 
-    private IGameRenderer _gameRenderer;
-
     private IGameSettings _gameSettings;
 
     private GameWorld _gameWorld;
+
+    private GameStateMachine _stateMachine;
+
+    private IUIService _uIService;
 
     public TemplateGame()
     {
@@ -69,6 +74,7 @@ public class TemplateGame : Game
         ));
 
         serviceCollection.AddSingleton<IEntityService, EntityService>();
+        serviceCollection.AddSingleton<IUIService, UIService>();
 
         // Tilemap services
         serviceCollection.AddSingleton<ITiledTilemapJsonConverterService, TiledTilemapJsonConverterService>();
@@ -92,6 +98,15 @@ public class TemplateGame : Game
             )
         );
 
+        serviceCollection.AddSingleton<IUIRenderer>(sp =>
+            new UIRenderer(
+               graphicsDevice: sp.GetRequiredService<GraphicsDevice>(),
+               spriteBatch: sp.GetRequiredService<SpriteBatch>(),
+               gameSettings: sp.GetRequiredService<IGameSettings>(),
+               uIService: sp.GetRequiredService<IUIService>()
+            )
+        );
+
         // Register the concrete GameWorld for TemplateGame ownership/mutation
         // then expose the same singleton as IGameWorld for read-only consumers such as the renderer
         serviceCollection.AddSingleton<GameWorld>();
@@ -100,11 +115,25 @@ public class TemplateGame : Game
            sp.GetRequiredService<GameWorld>()
         );
 
+        // Register state machine
+        serviceCollection.AddSingleton<GameStateMachine>(sp =>
+            new GameStateMachine(
+                initialState: new MenuState(
+                    nextState: new PlayingState(
+                        gameWorld: sp.GetRequiredService<IGameWorld>(),
+                        gameRenderer: sp.GetRequiredService<IGameRenderer>()
+                    ),
+                    uIRenderer: sp.GetRequiredService<IUIRenderer>()
+                )
+            )
+        );
+
         // Build the service provider
         _serviceProvider = serviceCollection.BuildServiceProvider();
 
-        _gameRenderer = _serviceProvider.GetRequiredService<IGameRenderer>();
         _gameSettings = _serviceProvider.GetRequiredService<IGameSettings>();
+
+        _uIService = _serviceProvider.GetRequiredService<IUIService>();
 
         _spriteBatch = _serviceProvider.GetRequiredService<SpriteBatch>();
         _spriteService = _serviceProvider.GetRequiredService<ISpriteService>();
@@ -112,6 +141,8 @@ public class TemplateGame : Game
         _tilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
 
         _gameWorld = _serviceProvider.GetRequiredService<GameWorld>();
+
+        _stateMachine = _serviceProvider.GetRequiredService<GameStateMachine>();
 
         _graphicsDeviceManager.IsFullScreen = false;
         _graphicsDeviceManager.PreferredBackBufferWidth = _gameSettings.WindowSize.Width;
@@ -149,7 +180,7 @@ public class TemplateGame : Game
          ),
          inputSource: inputSource
         );
-       
+
         _gameWorld.EntityService.Register(player1);
 
         var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
@@ -159,35 +190,25 @@ public class TemplateGame : Game
         );
 
         _gameWorld.AddTilemap(tilemap);
+
+        var menuFont = Content.Load<SpriteFont>(@$"Fonts\{_gameSettings.UISettings.MenuFontName}");
+        _uIService.RegisterSpriteFont(menuFont, _gameSettings.UISettings.MenuFontName);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
-        var entityService = _gameWorld.EntityService;
-         
-        // process input for entities that have input source (ie player entities)
-        var entitiesWithInputSource = entityService.GetEntitiesWithInputSource();
-        foreach (var entity in entitiesWithInputSource)
-        {
-            entity.InputSource.ProcessInput();
-        }
-
-        // Update all updateable entities
-        var updateableEntities = entityService.GetUpdatables();       
-        foreach (var entity in updateableEntities)
-        {
-            entity.Update(gameTime);
-        }
+        // Each game state is responsible for processing input, updating entities, game logic, UI, etc relevant to that state 
+        // so we call update on the current state.
+        _stateMachine.Update(gameTime);
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        _gameRenderer.Render();
+        // Each game state is responsible for drawing relevant entities or UI for that state
+        // so we call draw on the current state.
+        _stateMachine.Draw(gameTime);
 
         base.Draw(gameTime);
     }
@@ -216,6 +237,7 @@ public class TemplateGame : Game
         });
 
         return new GameSettings(
+            language: gameSettingsConfig.Language,
             internalSize: new Rectangle(
                 0, 0,
                 gameSettingsConfig.InternalSize.Width,
@@ -225,7 +247,16 @@ public class TemplateGame : Game
                 gameSettingsConfig.WindowSize.Width,
                 gameSettingsConfig.WindowSize.Height),
             animationSettings: new AnimationSettings(gameSettingsConfig.AnimationSettings.TargetFramesPerSecond),
-            tilemapSettings: new TilemapSettings((TilemapType)gameSettingsConfig.TilemapSettings.TilemapType)
+            tilemapSettings: new TilemapSettings((TilemapType)gameSettingsConfig.TilemapSettings.TilemapType),
+            uISettings: new UISettings(
+                gameSettingsConfig.UISettings.MenuFontName
+            ),
+            contentSettings: new ContentSettings(
+              new Dictionary<string, LanguageContent>(
+                gameSettingsConfig.ContentSettings.Languages,
+                StringComparer.OrdinalIgnoreCase
+              )
+            )
         );
     }
 }

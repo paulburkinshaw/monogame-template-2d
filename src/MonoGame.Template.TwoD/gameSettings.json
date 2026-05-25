@@ -1,4 +1,5 @@
 {
+  "language": "en",
   "internalSize": {
     "width": 640,
     "height": 360
@@ -12,5 +13,18 @@
   },
   "tilemapSettings": {
     "tilemapType": 1
+  },
+  "uiSettings": {
+    "menuFontName": "MenuFont"
+  },
+  "contentSettings": {
+    "languages": {
+      "en": {
+        "menuScreenMessage": "Press Space or Enter to start game"
+      },
+      "es": {
+        "menuScreenMessage": "Pulsa la barra espaciadora o la tecla Enter para comenzar el juego."
+      }
+    }   
   }
 }

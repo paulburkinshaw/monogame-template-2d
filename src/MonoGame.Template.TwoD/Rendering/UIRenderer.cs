@@ -1,72 +1,67 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Template.TwoD.Core;
-using MonoGame.Template.TwoD.World;
+using MonoGame.Template.TwoD.UI;
+using System;
 
 namespace MonoGame.Template.TwoD.Rendering;
 
-public interface IGameRenderer
+public interface IUIRenderer
 {
     public void Render();
 }
 
-public class GameRenderer : IGameRenderer
+public class UIRenderer : IUIRenderer
 {
     private readonly GraphicsDevice _graphicsDevice;
     private readonly SpriteBatch _spriteBatch;
     private RenderTarget2D _offScreenRenderTarget;
     private readonly IGameSettings _gameSettings;
-    private readonly IGameWorld _gameWorld;
+    private readonly IUIService _uIService;
+    private readonly LanguageContent _languageContent;
 
-    public GameRenderer(
+    public UIRenderer(
         GraphicsDevice graphicsDevice,
         SpriteBatch spriteBatch,
         IGameSettings gameSettings,
-        IGameWorld gameWorld
+        IUIService uIService
     )
     {
         _gameSettings = gameSettings;
         _graphicsDevice = graphicsDevice;
         _spriteBatch = spriteBatch;
-        _gameWorld = gameWorld;
+        _uIService = uIService;
 
         _offScreenRenderTarget = new RenderTarget2D(
             graphicsDevice,
             _gameSettings.InternalSize.Width,
             _gameSettings.InternalSize.Height
         );
+
+        _languageContent = _gameSettings.ContentSettings.GetForLanguage(_gameSettings.Language);
     }
 
     public void Render()
     {
-        DrawToOffScreenRenderTarget();
+        DrawUIToOffScreenRenderTarget();
 
         DrawRenderTargetToScreen();
     }
 
-    /// <summary>
-    /// Draw everything to an off-screen render target.
-    /// This allows us to apply scaling and other effects before drawing to the back buffer (the screen).
-    /// </summary>
-    private void DrawToOffScreenRenderTarget()
+    private void DrawUIToOffScreenRenderTarget()
     {
+        var xCenter = (_gameSettings.InternalSize.Width / 2) - 100;
+        var yCenter = (_gameSettings.InternalSize.Height / 2);
+
         _graphicsDevice.SetRenderTarget(_offScreenRenderTarget);
         _graphicsDevice.Clear(Color.Transparent);
 
         _spriteBatch.Begin();
 
-        var entityService = _gameWorld.EntityService;
-        var tilemap = _gameWorld.ActiveTilemap;
+        var menuFont = _uIService.GetSpriteFontByName(_gameSettings.UISettings.MenuFontName)
+            ?? throw new InvalidOperationException($"Font '{_gameSettings.UISettings.MenuFontName}' has not been registered.");
 
-        tilemap.Draw();
-
-        // Get renderable entities
-        var renderableEntities = entityService.GetRenderables();
-
-        foreach (var entity in renderableEntities)
-        {
-            entity.Draw();
-        }
+        _spriteBatch.DrawString(menuFont, _languageContent.MenuScreenMessage, new Vector2(xCenter, yCenter), Color.White);   
 
         _spriteBatch.End();
 

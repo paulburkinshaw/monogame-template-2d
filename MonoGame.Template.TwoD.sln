@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36109.1
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11806.211 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Template.TwoD", "src\MonoGame.Template.TwoD\MonoGame.Template.TwoD.csproj", "{B05BAB99-2D04-FF67-066F-FAD35D909308}"
 EndProject
@@ -31,6 +31,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTiled", "src\library-projects\MonoTiled\MonoTiled.csproj", "{6474AD03-8957-CBE8-CDC9-907B5EF786D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiledDotNet", "src\library-projects\TiledDotNet\TiledDotNet.csproj", "{AD5063A3-4236-7AE4-8949-BDA56FA6F585}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fonts", "Fonts", "{BC60DFB3-05B4-43F5-B0D6-8F9F9CCF1E8A}"
+	ProjectSection(SolutionItems) = preProject
+		src\MonoGame.Template.TwoD.Content\Fonts\MenuFont.spritefont = src\MonoGame.Template.TwoD.Content\Fonts\MenuFont.spritefont
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +67,7 @@ Global
 		{20F14BA6-E821-492D-8E31-C2A583B58838} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{03593248-A4F0-4B62-9944-6189DB12A36E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{FCFC70A7-A9E1-43B6-8C5A-6994406986E8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{BC60DFB3-05B4-43F5-B0D6-8F9F9CCF1E8A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09D963D9-DEB2-428A-A226-5666DECBD8CD}
