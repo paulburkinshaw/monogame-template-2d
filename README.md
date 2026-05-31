@@ -54,6 +54,8 @@ A MonoGame starter template with a clean, reusable project structure for 2D game
      └─ TiledDotNet                  → Tiled JSON deserialization
 ```
 
+> **Note:** The library projects (`MonoSprite`, `MonoTiled`, `TiledDotNet`) are currently included directly in this solution. They will be extracted into their own repositories and published as NuGet packages in a future update.
+
 # Project Structure
 
 ```
