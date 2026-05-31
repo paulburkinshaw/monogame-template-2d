@@ -51,7 +51,7 @@ public class MenuState : IGameState
 
     public void Draw(GameTime gameTime)
     {
-        /* draw menu UI */
+        // draw menu UI
         _uIRenderer.Render();
     }
 }

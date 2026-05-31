@@ -2,12 +2,56 @@
 
 A MonoGame starter template with a clean, reusable project structure for 2D games.
 
+---
+
+# Getting Started
+
+## Prerequisites
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [MonoGame](https://www.monogame.net/downloads/) (install the `dotnet-mgcb` and `dotnet-mgcb-editor` tools)
+- An IDE with C# support (Visual Studio, Rider, or VS Code with the C# extension)
+
+## Using this Template
+
+1. **Clone or download** this repository.
+2. **Copy** the `MonoGame.Template.TwoD.sln` file, along with the `src/MonoGame.Template.TwoD`, `src/MonoGame.Template.TwoD.Content`, `src/library-projects/`, and `.config` folders, into your new project location. Once copied you should have a structure like:
+    ```
+    /your-game-folder
+    ├─ MonoGame.Template.TwoD.sln
+    ├─ .config
+    └─ src/
+        ├─ MonoGame.Template.TwoD
+        ├─ MonoGame.Template.TwoD.Content
+        └─ library-projects/
+            ├─ MonoSprite
+            ├─ MonoTiled
+            └─ TiledDotNet
+    ```
+3. **Rename** the folders, solution, project files, and namespaces to match your game name (find/replace `MonoGame.Template.TwoD` across the solution). Remembering to update the filenames as well as the namespaces inside the code files.
+4. **Update `gameSettings.json`** with your desired resolution, font name, and content strings.
+5. **Build and run** — you should see the menu screen with your configured start prompt.
+
+## What the Template Gives You Out of the Box
+
+- A menu screen that transitions to a playing state on Space/Enter
+- A player sprite loaded from an Aseprite spritesheet, controllable via keyboard
+- A Tiled tilemap loaded and rendered
+- Internal resolution rendering scaled up to the window size (correct pixel art scaling)
+- A DI-wired game loop ready to extend
+
+---
+
 # Solution Structure
 
 ```
 /src
  ├─ MonoGame.Template.TwoD          → Main MonoGame game project
- └─ MonoGame.Template.TwoD.Content  → Content Pipeline project and game assets
+ ├─ MonoGame.Template.TwoD.Content  → Content Pipeline project and game assets
+ └─ library-projects/
+     ├─ MonoSprite                   → Sprite and Aseprite spritesheet support
+     ├─ MonoTiled                    → Tilemap rendering
+     └─ TiledDotNet                  → Tiled JSON deserialization
 ```
 
 # Project Structure
@@ -17,38 +61,95 @@ src/
   MonoGame.Template.TwoD/
     Program.cs
     TemplateGame.cs
+    gameSettings.json
     Core/
       GameSettings.cs
+      GameSettingsConfig.cs
     Rendering/
-      Camera2D.cs
       GameRenderer.cs
+      UIRenderer.cs
       DebugRenderer.cs
+    UI/
+      UIService.cs
     Input/
-      InputService.cs
+      IInputSource.cs
       KeyboardInputSource.cs
+      ControllerInputSource.cs
     States/
       IGameState.cs
       GameStateMachine.cs
-      PlayState.cs
+      MenuState.cs
+      PlayingState.cs
     World/
-      SceneService.cs
-      World.cs
+      IGameWorld.cs
+      GameWorld.cs
     Gameplay/
-      Entities/
+      GameEntities/
         IEntity.cs
+        Entity.cs
+        EntityService.cs
+        IHasInputSource.cs
+        IHasTransform.cs
+        IRenderable.cs
+        IUpdatable.cs
+        Transform.cs
+        Player.cs
 
   MonoGame.Template.TwoD.Content/
     Content.mgcb
+    Fonts/
     Spritesheets/
     Tilesets/
     Tilemaps/
 ```
 
-- `TemplateGame.cs` is the main MonoGame game class.
-- `GameRenderer.cs` handles game rendering and presentation.
+- `TemplateGame.cs` is the main MonoGame game class. Handles DI setup, content loading, and delegates update/draw to the state machine.
+- `gameSettings.json` drives resolution, animation settings, tilemap type, active language, and localised content strings.
+- `GameSettingsConfig.cs` is the JSON deserialization DTO for `gameSettings.json`.
+- `GameRenderer.cs` renders game entities and tilemaps to an off-screen render target, then scales to the window.
+- `UIRenderer.cs` renders UI elements (fonts, HUD) to a separate off-screen render target.
+- `UIService.cs` manages sprite font registration and retrieval by name.
 - `DebugRenderer.cs` contains debug-only rendering helpers.
-- `GameStateMachine.cs` manages high-level game states.
-- `World.cs` is the simulation container for game objects and world state.
+- `GameStateMachine.cs` manages high-level game states. States receive the machine via `Enter()` and trigger transitions via `ChangeState()`.
+- `MenuState.cs` is the initial state — displays a start prompt and transitions to `PlayingState` on Space/Enter.
+- `PlayingState.cs` runs the main game loop — processes input, updates entities, and renders.
+- `GameWorld.cs` is the simulation container for entities and the active tilemap.
+- `EntityService.cs` manages entity registration and querying by capability (updatable, renderable, has input source).
+
+---
+
+# gameSettings.json
+
+`gameSettings.json` is the central configuration file for the template. It is loaded at startup and drives the following:
+
+| Section | Purpose |
+|---|---|
+| `language` | Active language key (e.g. `"en"`). Used to select the correct content strings at runtime. |
+| `internalSize` | The resolution the game renders at internally (e.g. 640x360 for pixel art). |
+| `windowSize` | The resolution of the game window. Should be a whole-number multiple of `internalSize`. |
+| `animationSettings.targetFramesPerSecond` | Target update rate for sprite animations. |
+| `tilemapSettings.tilemapType` | Tilemap rendering mode (`0` = Static, `1` = Dynamic). |
+| `uiSettings.menuFontName` | The name of the SpriteFont asset used for menu text. Must match the font registered in `LoadContent`. |
+| `contentSettings.languages` | Localised content strings keyed by language code. Add a new language key alongside `"en"` to support additional languages. |
+
+### Example
+
+```json
+{
+  "language": "en",
+  "internalSize": { "width": 640, "height": 360 },
+  "windowSize": { "width": 1920, "height": 1080 },
+  "animationSettings": { "targetFramesPerSecond": 30 },
+  "tilemapSettings": { "tilemapType": 1 },
+  "uiSettings": { "menuFontName": "MenuFont" },
+  "contentSettings": {
+    "languages": {
+      "en": { "menuScreenMessage": "Press Space or Enter to start game" },
+      "es": { "menuScreenMessage": "Pulsa la barra espaciadora o Enter para comenzar." }
+    }
+  }
+}
+```
 
 ---
 
