@@ -34,6 +34,8 @@ A MonoGame starter template with a clean, reusable project structure for 2D game
 
 ## What the Template Gives You Out of the Box
 
+The template runs immediately after cloning — no additional setup required beyond the prerequisites. Hit run and you'll see a working game with:
+
 - A menu screen that transitions to a playing state on Space/Enter
 - A player sprite loaded from an Aseprite spritesheet, controllable via keyboard
 - A Tiled tilemap loaded and rendered
