@@ -92,7 +92,6 @@ src/
         IEntity.cs
         Entity.cs
         EntityService.cs
-        IHasInputSource.cs
         IHasTransform.cs
         IRenderable.cs
         IUpdatable.cs

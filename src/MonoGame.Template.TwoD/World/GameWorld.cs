@@ -30,4 +30,11 @@ public class GameWorld : IGameWorld
         _tilemaps.Add(tilemap);
         _activeTilemap = tilemap;
     }
+
+    public void AddEntity(IEntity entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        EntityService.Register(entity);
+    }
 }

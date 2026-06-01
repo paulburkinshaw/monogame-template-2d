@@ -181,7 +181,7 @@ public class TemplateGame : Game
          inputSource: inputSource
         );
 
-        _gameWorld.EntityService.Register(player1);
+        _gameWorld.AddEntity(player1);
 
         var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
         var tilemap = _tilemapService.Load(
