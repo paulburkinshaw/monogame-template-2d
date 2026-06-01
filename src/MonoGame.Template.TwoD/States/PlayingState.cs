@@ -44,13 +44,6 @@ public class PlayingState : IGameState
 
         var entityService = _gameWorld.EntityService;
 
-        // process input for entities that have input source (ie player entities)
-        var entitiesWithInputSource = entityService.GetEntitiesWithInputSource();
-        foreach (var entity in entitiesWithInputSource)
-        {
-            entity.InputSource.ProcessInput();
-        }
-
         // Update all updateable entities
         var updateableEntities = entityService.GetUpdatables();
         foreach (var entity in updateableEntities)
