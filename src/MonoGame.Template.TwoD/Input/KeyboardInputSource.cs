@@ -4,7 +4,7 @@ namespace MonoGame.Template.TwoD.Input;
 
 public class KeyboardInputSource : IInputSource
 {
-    private KeyboardState _keyboardStateOld = Keyboard.GetState();
+    private InputManager _input;
 
     Keys _leftKey;
     Keys _rightKey;
@@ -20,6 +20,8 @@ public class KeyboardInputSource : IInputSource
        Keys downKey
        )
     {
+        _input = TemplateGame.Input;
+
         _leftKey = leftKey;
         _rightKey = rightKey;
         _upKey = upKey;
@@ -40,24 +42,10 @@ public class KeyboardInputSource : IInputSource
     }
 
     private void ProcessKeyboardState()
-    {
-        var keyboardState = Keyboard.GetState();
-
-        // Reset flags each frame
-        MoveLeft = false;
-        MoveRight = false;
-        MoveUp = false;
-        MoveDown = false;
-
-        MoveLeft = keyboardState.IsKeyDown(_leftKey);
-        MoveRight = keyboardState.IsKeyDown(_rightKey);
-        MoveUp = keyboardState.IsKeyDown(_upKey);
-        MoveDown = keyboardState.IsKeyDown(_downKey);
-
-        // _keyboardStateOld is available here for "just pressed" detection if needed
-        // e.g. bool jumpJustPressed = keyboardState.IsKeyDown(_jumpKey) && _keyboardStateOld.IsKeyUp(_jumpKey);
-
-        // Set the old keyboard state ready for the next frame
-        _keyboardStateOld = keyboardState;
+    {       
+        MoveLeft = _input.Keyboard.IsKeyDown(_leftKey);
+        MoveRight = _input.Keyboard.IsKeyDown(_rightKey);
+        MoveUp = _input.Keyboard.IsKeyDown(_upKey);
+        MoveDown = _input.Keyboard.IsKeyDown(_downKey);
     }
 }

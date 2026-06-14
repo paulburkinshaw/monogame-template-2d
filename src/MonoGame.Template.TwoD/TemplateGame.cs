@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Template.TwoD.Core;
 using MonoGame.Template.TwoD.Gameplay.GameEntities;
 using MonoGame.Template.TwoD.Input;
 using MonoGame.Template.TwoD.Rendering;
-using MonoGame.Template.TwoD.States;
 using MonoGame.Template.TwoD.UI;
 using MonoGame.Template.TwoD.World;
+using MonoGame.Template.TwoD.Scenes;
 using MonoSprite;
 using MonoSprite.Converters;
 using MonoTiled;
@@ -25,28 +25,31 @@ namespace MonoGame.Template.TwoD;
 public class TemplateGame : Game
 {
     private const string GAMESETTINGS_FILE = "gameSettings.json";
-
     private IServiceProvider _serviceProvider;
-
     private GraphicsDeviceManager _graphicsDeviceManager;
-    // One SpriteBatch instance will be used for the whole game
-    private SpriteBatch _spriteBatch;
-    private ISpriteService _spriteService;
+    private SceneManager _sceneManager;
 
-    private ITilemapService _tilemapService;
-
-    private IGameSettings _gameSettings;
-
-    private GameWorld _gameWorld;
-
-    private GameStateMachine _stateMachine;
-
-    private IUIService _uIService;
+    public static IGameSettings GameSettings { get; private set; }
+    public static new ContentManager Content { get; private set; }
+    public static IGameWorld GameWorld { get; private set; }
+    public static GameWorld ConcreteGameWorld { get; private set; }
+    public static IGameRenderer GameRenderer { get; private set; }
+    public static IUIRenderer UIRenderer { get; private set; }
+    public static IUIService UIService { get; private set; }
+    public static ISpriteService SpriteService { get; private set; }
+    public static ITilemapService TilemapService { get; private set; }
+    public static SpriteBatch SpriteBatch { get; private set; }
+    public static InputManager Input { get; private set; }
 
     public TemplateGame()
     {
         _graphicsDeviceManager = new GraphicsDeviceManager(this);
+
+        // Set the content manager to a reference of the base Game's
+        // content manager.
+        Content = base.Content;
         Content.RootDirectory = "MonoGame.Template.TwoD.Content";
+
         IsMouseVisible = true;
     }
 
@@ -58,6 +61,7 @@ public class TemplateGame : Game
         serviceCollection.AddSingleton<IGameSettings>(gameSettings);
 
         serviceCollection.AddSingleton(GraphicsDevice);
+        // One SpriteBatch instance will be used for the whole game
         serviceCollection.AddSingleton<SpriteBatch>();
 
         serviceCollection.AddSingleton<IFileSystem, FileSystem>();
@@ -107,108 +111,81 @@ public class TemplateGame : Game
             )
         );
 
-        // Register the concrete GameWorld for TemplateGame ownership/mutation
+        // Register the concrete GameWorld for GameplayScene ownership/mutation
         // then expose the same singleton as IGameWorld for read-only consumers such as the renderer
-        serviceCollection.AddSingleton<GameWorld>();
+        serviceCollection.AddSingleton<GameWorld>(sp =>
+            new GameWorld(
+                entityService: sp.GetRequiredService<IEntityService>()
+            )
+        );
 
         serviceCollection.AddSingleton<IGameWorld, GameWorld>(sp =>
            sp.GetRequiredService<GameWorld>()
         );
 
-        // Register state machine
-        serviceCollection.AddSingleton<GameStateMachine>(sp =>
-            new GameStateMachine(
-                initialState: new MenuState(
-                    nextState: new PlayingState(
-                        gameWorld: sp.GetRequiredService<IGameWorld>(),
-                        gameRenderer: sp.GetRequiredService<IGameRenderer>()
-                    ),
-                    uIRenderer: sp.GetRequiredService<IUIRenderer>()
-                )
+        // Register SceneManager
+        serviceCollection.AddSingleton<SceneManager>(sp =>
+            new SceneManager(
+                initialScene: new MenuScene()
             )
         );
 
         // Build the service provider
         _serviceProvider = serviceCollection.BuildServiceProvider();
 
-        _gameSettings = _serviceProvider.GetRequiredService<IGameSettings>();
+        GameSettings = _serviceProvider.GetRequiredService<IGameSettings>();
 
-        _uIService = _serviceProvider.GetRequiredService<IUIService>();
+        SpriteBatch = _serviceProvider.GetRequiredService<SpriteBatch>();
+        SpriteService = _serviceProvider.GetRequiredService<ISpriteService>();
+        TilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
 
-        _spriteBatch = _serviceProvider.GetRequiredService<SpriteBatch>();
-        _spriteService = _serviceProvider.GetRequiredService<ISpriteService>();
+        ConcreteGameWorld = _serviceProvider.GetRequiredService<GameWorld>();
+        GameWorld = _serviceProvider.GetRequiredService<IGameWorld>();
 
-        _tilemapService = _serviceProvider.GetRequiredService<ITilemapService>();
+        GameRenderer = _serviceProvider.GetRequiredService<IGameRenderer>();
+        UIRenderer = _serviceProvider.GetRequiredService<IUIRenderer>();
 
-        _gameWorld = _serviceProvider.GetRequiredService<GameWorld>();
+        UIService = _serviceProvider.GetRequiredService<IUIService>();
 
-        _stateMachine = _serviceProvider.GetRequiredService<GameStateMachine>();
+        _sceneManager = _serviceProvider.GetRequiredService<SceneManager>();
 
         _graphicsDeviceManager.IsFullScreen = false;
-        _graphicsDeviceManager.PreferredBackBufferWidth = _gameSettings.WindowSize.Width;
-        _graphicsDeviceManager.PreferredBackBufferHeight = _gameSettings.WindowSize.Height;
+        _graphicsDeviceManager.PreferredBackBufferWidth = GameSettings.WindowSize.Width;
+        _graphicsDeviceManager.PreferredBackBufferHeight = GameSettings.WindowSize.Height;
         _graphicsDeviceManager.ApplyChanges();
         _graphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
 
         IsFixedTimeStep = true;
-        TargetElapsedTime = _gameSettings.AnimationSettings.TargetElapsedTime;
+        TargetElapsedTime = GameSettings.AnimationSettings.TargetElapsedTime;
+
+        // Create a new input manager.
+        Input = new InputManager();
 
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
-        var playerSprite = _spriteService.CreateSpriteInstance(
-            spritesheetFilepath: @"Spritesheets",
-            spritesheetName: "player1-spritesheet",
-            initialAnimationName: "Landed",
-            _spriteBatch);
 
-        // This could come from a main menu selection
-        var inputSource = new KeyboardInputSource(
-            leftKey: Keys.A,
-            rightKey: Keys.D,
-            upKey: Keys.W,
-            downKey: Keys.X
-        );
 
-        var player1 = new Player(
-         sprite: playerSprite,
-         transform: new Transform(
-             position: new Vector2(40, 230),
-             origin: new Vector2(8, 8)
-         ),
-         inputSource: inputSource
-        );
-
-        _gameWorld.AddEntity(player1);
-
-        var tilemapFilePath = @"Content\Tilemaps\tilemap1.tmj";
-        var tilemap = _tilemapService.Load(
-           tilemapFilepath: tilemapFilePath,
-           tilesetFilepath: "Tilesets"
-        );
-
-        _gameWorld.AddTilemap(tilemap);
-
-        var menuFont = Content.Load<SpriteFont>(@$"Fonts\{_gameSettings.UISettings.MenuFontName}");
-        _uIService.RegisterSpriteFont(menuFont, _gameSettings.UISettings.MenuFontName);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        // Each game state is responsible for processing input, updating entities, game logic, UI, etc relevant to that state 
-        // so we call update on the current state.
-        _stateMachine.Update(gameTime);
+        Input.Update(gameTime);
+
+        // Each scene is responsible for processing input, updating entities, game logic, UI, etc relevant to that scene 
+        // so we call update on the current scene.
+        _sceneManager.Update(gameTime);
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        // Each game state is responsible for drawing relevant entities or UI for that state
-        // so we call draw on the current state.
-        _stateMachine.Draw(gameTime);
+        // Each scene is responsible for drawing relevant entities or UI for that scene
+        // so we call draw on the current scene.
+        _sceneManager.Draw(gameTime);
 
         base.Draw(gameTime);
     }
